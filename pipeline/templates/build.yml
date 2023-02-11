@@ -1,6 +1,7 @@
 parameters:
 - name: SkipTests
   type: boolean
+  default: true
 steps:
 - powershell: .Tests/Invoke-Pester.ps1
   displayName: "Run Pester"
