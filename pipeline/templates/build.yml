@@ -8,7 +8,7 @@ steps:
   failOnStderr: true
   continueOnError: true
   condition: eq('${{ parameters.SkipTests }}', false)
-- task: ArchiveFiles
+- task: ArchiveFiles@2
   displayName: 'Archive files Functions'
   inputs:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/$(PSFunctionFolderName)'
