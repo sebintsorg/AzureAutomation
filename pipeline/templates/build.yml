@@ -4,7 +4,7 @@ parameters:
 steps:
 - powershell: .Tests/Invoke-Pester.ps1
   displayName: "Run Pester"
-  failOnStdError: true
+  failOnStderr: true
   continueOnError: true
   condition: eq('${{ parameters.SkipTests }}', false)
 - task: ArchiveFiles
