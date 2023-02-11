@@ -1,0 +1,19 @@
+parameters:
+- name: SkipTests
+  type: boolean
+steps:
+- powershell: .Tests/Invoke-Pester.ps1
+  displayName: "Run Pester"
+  failOnStdError: true
+  continueOnError: true
+  condition: eq('${{ parameters.SkipTests }}', false)
+- task: ArchiveFiles
+  displayName: 'Archive files Functions'
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/$(PSFunctionFolderName)'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: $(Build.ArtifactStagingDirectory)/$(PSFunctionFolderName)/$(Build.BuildId).zip
+    replaceExistingArchive: true
+- publish: $(Build.ArtifactStagingDirectory)
+  artifact: dropBackupFunctionApp
