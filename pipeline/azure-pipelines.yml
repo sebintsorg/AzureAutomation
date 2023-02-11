@@ -12,6 +12,13 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+parameters:
+- name: SkipTests
+  type: boolean
+  default: true
+
+variables:
+  PSFunctionFolderName: Function
 # abc
 # some changes
 stages:
