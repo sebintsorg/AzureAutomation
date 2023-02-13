@@ -16,6 +16,9 @@ parameters:
 - name: SkipTests
   type: boolean
   default: true
+- name: DeployInfra
+  type: boolean
+  default: false
 
 variables:
   PSFunctionFolderName: Function
@@ -28,3 +31,24 @@ stages:
       - job: BuildJob
         steps:
           - template: templates/build.yml
+  - stage: DeployInfraToDev
+    condition: and(succeeded('Build')
+    variables: 
+      - group: TestGroup
+    jobs:
+      - deployment: Deploy_Infra_Dev
+        condition: eq('${{ parameters.DeployInfra }}', true)
+        displayName: Deploy Infrastructure
+        pool:
+          vmImage: 'windows-latest'
+        timeoutInMinutes: 0
+        environment: "Development"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: templates/azure-pipelines-Infra.yml
+                  parameters:
+                    DeployBaseInfra: '${{ parameters.DeployInfra }}'
+                    AzureConnectionName: 'testaccessspn'
+                    ansibleTowerConn: "CTP-GREYMATTER-TOWER-DEV" 
