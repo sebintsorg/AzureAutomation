@@ -1,0 +1,38 @@
+parameters:
+- name: DeployBaseInfra
+  type: boolean
+- name: AzureConnectionName
+  type: string
+- name: ansibleTowerConn
+  type: string
+
+steps:
+
+- task: AzureResourceGroupDeployment@2
+  displayName: ARM - Create Application Insights
+  name: AppInsights1
+  inputs:
+    ConnectedServiceName: 'testaccessspn'
+    subscriptionId: '$(var_subscriptionId)'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: '$(var_resourceGroupName)'
+    location: '$(var_location)'
+    csmFile: '$(Pipeline.Workspace)/dropHelper-scripts/RG_Deploy.json'
+    overrideParameters: '-appInsightsName $(var_appInsightsName) -location $(var_location)'
+    templateLocation: 'Linked artifact'
+    deploymentMode: 'Incremental'
+    deploymentName: 'AppInsightsDeploy1'
+
+- task: AzureResourceGroupDeployment@3
+  displayName: ARM - Create Alerts
+  condition: succeeded()
+  name: Alerts1
+  inputs:
+    ConnectedServiceName: 'testaccessspn'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: '$(var_resourceGroupName)'
+    location: '$(var_location)'
+    csmFile: '$(Pipeline.Workspace)/dropHelper-scripts/Alerts1.json'
+    overrideParameters: '-actionGroupName $(var_actionGroupName) -alertGroupEmails $(var_alertGroupEmails) -alertName $(var_alertName) -alertLocation $(var_location) -alertDesc "$(var_alertDescription)" -alertFrequency $(var_alertFrequency) -alertPeriod $(var_alertPeriod) -alertSeverityUnKnownError $(var_alertSeverityUnKnownError) -alertSeverityKnownError $(var_alertSeverityKnownError) -appInsightsName $(var_appInsightsName) -subId $(var_subscriptionId) -rgName $(var_resourceGroupName)'
+    templateLocation: 'Linked artifact'
+    deploymentMode: 'Incremental'
